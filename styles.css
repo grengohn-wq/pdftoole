@@ -1,0 +1,168 @@
+/* styles.css - تصميم عصري وRTL */
+:root{
+  --bg: #f6fbff;
+  --card: #ffffff;
+  --accent: #2b7a78; /* teal-ish */
+  --accent-2: #1f6fbe; /* blue */
+  --muted: #6b7280;
+  --danger: #d9534f;
+  --radius: 10px;
+}
+
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0;font-family: 'Cairo', "Segoe UI", Tahoma, Arial, sans-serif;background:linear-gradient(180deg,#f4fbff,#f6fbff);color:#083344;
+  -webkit-font-smoothing:antialiased;padding:22px 18px;line-height:1.45;
+}
+header{background:linear-gradient(90deg,var(--accent-2),var(--accent));color:white;padding:18px;border-radius:10px}
+header{display:flex;align-items:center;gap:14px;justify-content:space-between}
+header h1{margin:0;font-size:20px;font-weight:800;letter-spacing:0.2px}
+header .subtitle{font-size:13px;opacity:0.95;font-weight:500}
+.info-bar{margin:12px 0;padding:10px;border-radius:8px;background:linear-gradient(90deg, #e6fbf7, #eef7ff);color:#044f45;font-weight:600}
+
+.container{display:grid;grid-template-columns:300px 1fr;gap:22px;align-items:start}
+.tabs{background:transparent;padding:6px;border-radius:12px}
+.tabs .tab{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:12px;border:none;background:transparent;font-weight:700;margin-bottom:10px;cursor:pointer;color:#063141}
+.tabs .tab svg{width:20px;height:20px;opacity:0.85}
+.tabs .tab:hover{transform:translateX(6px);background:linear-gradient(90deg, rgba(31,111,190,0.06), rgba(43,122,120,0.03));box-shadow:0 6px 18px rgba(3,15,25,0.04)}
+.tabs .tab.active{background:linear-gradient(90deg,var(--accent),var(--accent-2));color:white;box-shadow:0 12px 30px rgba(31,111,190,0.12)}
+.tab .pill{background:#ffdd57;color:#2b2b2b;padding:4px 10px;border-radius:12px;margin-inline-start:8px;font-size:12px}
+.tab[disabled]{opacity:0.7;cursor:default}
+
+.tool-area{background:var(--card);padding:22px;border-radius:16px;box-shadow:0 20px 40px rgba(3,15,25,0.06)}
+.panel{display:none}
+.panel.active{display:block}
+.tool{margin-top:12px;display:flex;flex-direction:column;gap:12px}
+.file-label{display:inline-flex;align-items:center;gap:12px;padding:12px 18px;background:linear-gradient(180deg,#ffffff,#f7fdff);border-radius:12px;cursor:pointer;border:1px solid #e9f4fb;font-weight:700}
+.file-label input{display:none}
+.file-label::before{content:'📁';font-size:18px}
+.file-info{color:var(--muted);font-size:13px}
+input[type="text"]{padding:14px;border-radius:12px;border:1px solid #e2f0fb;background:linear-gradient(180deg,#fbfeff,#f6fcff)}
+.primary{background:linear-gradient(90deg,var(--accent),var(--accent-2));color:white;padding:12px;border:none;border-radius:12px;font-weight:800;cursor:pointer}
+.primary:hover{transform:translateY(-4px);box-shadow:0 18px 40px rgba(21,101,192,0.12)}
+.error{color:var(--danger);font-weight:700}
+.result a{display:inline-block;margin-top:8px;padding:12px 18px;background:linear-gradient(90deg,#eafff6,#e8fff7);color:#044f45;border-radius:12px;text-decoration:none;font-weight:800}
+.download-link{display:inline-flex;align-items:center;gap:10px;padding:10px 16px;background:linear-gradient(90deg,#e9fffb,#e2f7ff);color:#044f45;border-radius:12px;text-decoration:none;font-weight:800;border:1px solid rgba(4,79,69,0.06)}
+.download-link:hover{box-shadow:0 18px 40px rgba(19,122,113,0.12);transform:translateY(-4px)}
+.muted{color:var(--muted)}
+.lead{font-weight:700}
+
+.ad-slot{margin:18px 0;padding:14px;border-radius:12px;background:transparent;border:none;color:var(--muted);text-align:center;min-height:auto}
+
+/* Ad slots - clean appearance for real ads */
+.ad-slot[data-ad-position="top"]{min-height:90px}
+.ad-slot[data-ad-position="middle"]{min-height:120px}
+.ad-slot[data-ad-position="bottom"]{min-height:90px}
+.ad-slot[data-ad-position="article"]{min-height:120px}
+.ad-slot .adsbygoogle{display:block;margin:0 auto}
+
+article{margin-top:24px;line-height:1.95;color:#083344}
+
+footer{margin-top:28px;text-align:center;color:var(--muted)}
+
+/* responsive */
+@media (max-width:1000px){
+  .container{grid-template-columns:1fr;}
+  .tabs{order:2}
+}
+
+/* small toast */
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:24px;background:linear-gradient(90deg,#1f6fbe,#2b7a78);color:white;padding:10px 14px;border-radius:10px;z-index:1000;opacity:0;pointer-events:none;transition:opacity .25s, transform .2s}
+.toast.show{opacity:1;pointer-events:auto;transform:translateX(-50%) translateY(-6px)}
+/* subtle utility */
+.small{font-size:13px}
+.muted-2{color:#69808a}
+
+/* Progress bar */
+.progress-container{display:none;position:relative;background:rgba(255,255,255,0.8);border-radius:12px;padding:8px;margin:12px 0;align-items:center}
+.progress-container.show{display:flex}
+.progress-bar{height:10px;background:linear-gradient(90deg,var(--accent),var(--accent-2));border-radius:8px;transition:width .3s ease}
+.progress-text{font-size:13px;color:var(--muted);margin-inline-start:12px}
+
+/* Download widget */
+.download-widget{display:flex;gap:8px;align-items:center;margin-top:8px}
+.download-widget input[type="text"]{padding:10px;border-radius:8px;border:1px solid #e6f0f8}
+.download-widget button{padding:10px 12px;border-radius:8px;background:linear-gradient(90deg,var(--accent),var(--accent-2));color:#fff;border:none;cursor:pointer}
+
+/* Thumbnails in edit tool */
+.thumb-canvas{width:110px;height:auto;border-radius:6px;border:1px solid #e6f0f8;background:white}
+.page-row{display:flex;align-items:center;gap:12px;padding:8px;border-radius:8px}
+.page-row .meta{min-width:110px}
+
+/* Dark mode */
+body.dark{background:linear-gradient(180deg,#071a1f,#072830);color:#d7eef0}
+body.dark header{background:linear-gradient(90deg,#05364a,#043b2e);color:#dff6f2}
+body.dark .tool-area{background:#07272c;color:#d7eef0}
+body.dark .file-label{background:#0a2b31;border:1px solid rgba(255,255,255,0.04)}
+body.dark input[type="text"]{background:#062226;border:1px solid rgba(255,255,255,0.04);color:#cfeeea}
+body.dark .primary{box-shadow:0 10px 30px rgba(0,0,0,0.3)}
+body.dark .ad-slot{background:linear-gradient(180deg,#05292f,#063136);border-color:rgba(255,255,255,0.04)}
+body.dark .tabs .tab{color:#bfe7e4}
+body.dark .download-link{background:linear-gradient(90deg,#063b34,#043f5b);color:#e6fff9;border-color:rgba(255,255,255,0.04)}
+
+/* header controls */
+.header-controls{display:flex;align-items:center;gap:8px}
+.header-controls button{background:transparent;border:1px solid rgba(255,255,255,0.06);padding:8px;border-radius:8px;cursor:pointer;font-size:16px}
+
+/* Hide the ad preview toggle visually (admin-only access via shortcut) */
+#adPreviewToggle{display:none}
+
+/* Admin modal styles */
+.modal{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(2,6,8,0.45);z-index:1200;opacity:0;pointer-events:none;transition:opacity .18s ease}
+.modal[aria-hidden="false"]{opacity:1;pointer-events:auto}
+.modal-content{background:var(--card);padding:18px;border-radius:12px;min-width:320px;max-width:420px;box-shadow:0 20px 40px rgba(3,15,25,0.2);text-align:right}
+.modal-content h3{margin:0 0 8px 0}
+.modal-content input[type="password"]{width:100%;padding:10px;border-radius:8px;border:1px solid #e6f0f8;margin-top:8px}
+.modal-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:12px}
+.modal .secondary{background:#f3f6f8;border:1px solid #e6eef5;padding:8px 10px;border-radius:8px}
+.modal .primary{background:linear-gradient(90deg,var(--accent),var(--accent-2));color:white;padding:8px 12px;border-radius:8px;border:none}
+
+/* Page editor full-screen styles */
+.page-editor-modal{position:fixed;inset:0;display:flex;flex-direction:column;background:rgba(4,12,16,0.85);z-index:1300;opacity:0;pointer-events:none;transition:opacity .18s}
+.page-editor-modal[aria-hidden="false"]{opacity:1;pointer-events:auto}
+.page-editor-toolbar{display:flex;justify-content:space-between;align-items:center;padding:12px 18px;background:rgba(255,255,255,0.04);backdrop-filter:blur(6px);}
+.page-editor-toolbar .left{font-weight:800;color:var(--card);}
+.page-editor-toolbar .right{display:flex;gap:8px}
+.page-editor-content{flex:1;display:flex;align-items:center;justify-content:center;padding:18px}
+.editor-canvas-wrap{position:relative;max-width:95%;max-height:95%;overflow:auto;background:white;border-radius:8px}
+#editorCanvas{display:block;max-width:100%;height:auto}
+.editor-overlays{position:absolute;inset:0;pointer-events:none}
+.editor-overlays .overlay{position:absolute;border:1px dashed rgba(31,111,190,0.6);background:rgba(255,255,255,0.0);padding:2px;cursor:pointer;pointer-events:auto}
+.overlay input[type="text"]{border:none;background:rgba(255,255,255,0.9);padding:4px;border-radius:4px}
+
+
+/* تحسين إضافي لعناصر التحكم والصفحات */
+.tool label{font-weight:700}
+input[type="file"]{display:inline-block}
+button{transition:all .18s ease}
+.tab{transition:background .15s ease, transform .12s ease}
+
+/* قائمة الصفحات في أداة التعديل */
+#pagesList{background:linear-gradient(180deg,#fff,#fbfeff);padding:10px;border-radius:8px;border:1px solid #eef6fb}
+#pagesList div{background:transparent;padding:8px;border-radius:6px}
+#pagesList button{background:#f3f7fb;border:1px solid #e6f0f8;padding:6px 8px;border-radius:6px;cursor:pointer}
+#pagesList button:hover{background:#e8f3ff}
+
+/* inputs and small controls */
+input[type="text"], .file-label{width:100%}
+label.muted{font-size:13px;color:var(--muted)}
+
+/* small helper for status messages */
+.file-info{font-size:13px}
+
+/* footer and layout tweaks */
+footer{font-size:13px;opacity:0.9}
+
+/* subtle shadows for panels */
+.tool-area{box-shadow:0 12px 30px rgba(3,15,25,0.06)}
+
+/* accessible focus states */
+button:focus, .tab:focus, input:focus{outline:3px solid rgba(31,111,190,0.12);outline-offset:2px}
+
+/* small screen tweaks */
+@media (max-width:480px){
+  header h1{font-size:16px}
+  .file-label{padding:10px}
+  .primary{padding:10px}
+}

@@ -1,0 +1,291 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>مدير PDF - أدوات مجانية لتحويل وإدارة ملفات PDF</title>
+  <!-- خط عربي حديث لتحسين الواجهة -->
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <!-- pdf-lib from CDN -->
+  <script src="https://unpkg.com/pdf-lib/dist/pdf-lib.min.js"></script>
+  <!-- JSZip for creating zip archives client-side (used for split) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+  <!-- PDF.js for text extraction (PDF -> Word) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+  <!-- ===== AdSense / إثبات الملكية =====
+    أدناه وضعنا مثالاً لمقتطف AdSense — الشيفرة مفعّلة (افتح الموقع عبر HTTPS عند النشر).
+    استبدل "ca-pub-..." بالقيمة الخاصة بحسابك عند الحاجة.
+  -->
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2108027030250763" crossorigin="anonymous"></script>
+
+  <!-- علامة وصفية للوثوق/التحقق: ضع رمز التحقق الذي يزودك به Google Search Console هنا -->
+  <meta name="google-site-verification" content="PUT_VERIFICATION_CODE_HERE">
+</head>
+<body>
+  <header>
+    <div>
+      <h1>مدير PDF - أدوات مجانية لتحويل وإدارة ملفات PDF</h1>
+      <div class="subtitle small">أدوات آمنة تعمل داخل المتصفح — خصوصيتك محفوظة</div>
+    </div>
+    <div class="header-controls">
+      <button id="themeToggle" title="تبديل الوضع الداكن" aria-pressed="false">🌙</button>
+      <button id="adPreviewToggle" title="عرض إعلان تجريبي" aria-pressed="false">📣 معاينة إعلان</button>
+    </div>
+  </header>
+
+  <!-- Admin login modal (hidden). Open via Ctrl+Alt+A -->
+  <div id="adminModal" class="modal" aria-hidden="true">
+    <div class="modal-content" role="dialog" aria-modal="true" aria-labelledby="adminTitle">
+      <h3 id="adminTitle">واجهة المشرف (محمية)</h3>
+      <p class="muted">أدخل كلمة المرور للدخول إلى لوحة الإدارة (مخفيّة).</p>
+      <input id="adminPassword" type="password" placeholder="كلمة المرور" aria-label="كلمة مرور المشرف">
+      <div class="modal-actions">
+        <button id="adminCancel" class="secondary">إلغاء</button>
+        <button id="adminSubmit" class="primary">دخول</button>
+      </div>
+      <div id="adminMsg" class="muted" aria-live="polite" style="margin-top:8px"></div>
+    </div>
+  </div>
+
+  <div class="info-bar">🔒 آمنة 100% - 🚀 سريعة - 💾 لا يتم رفع الملفات إلى أي سيرفر</div>
+
+  <main>
+    <div class="container">
+      <aside class="tabs" role="tablist" aria-label="أدوات PDF">
+        <button class="tab active" data-target="extract">استخراج صفحات PDF</button>
+        <button class="tab" data-target="split">تقسيم PDF</button>
+        <button class="tab" data-target="merge">دمج PDF</button>
+        <button class="tab" data-target="pdf2word">PDF إلى Word</button>
+        <button class="tab" data-target="edit">تعديل PDF</button>
+        <button class="tab" data-target="img2pdf">صورة إلى PDF</button>
+      </aside>
+
+      <section class="tool-area">
+
+        <div class="ad-slot ad-top" data-ad-position="top">
+          <!-- Google AdSense Ad Unit - Top -->
+          <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-2108027030250763" data-ad-slot="TOP_SLOT_ID" data-ad-format="auto" data-full-width-responsive="true"></ins>
+        </div>
+
+        <!-- Progress bar for long operations -->
+        <div id="progressContainer" class="progress-container" aria-hidden="true">
+          <div id="progressBar" class="progress-bar" style="width:0%"></div>
+          <div id="progressText" class="progress-text">جارٍ المعالجة...</div>
+        </div>
+
+        <section id="extract" class="panel active">
+          <h2>أداة استخراج صفحات من PDF</h2>
+          <p class="lead">استخرج صفحات محددة من ملف PDF الخاص بك وأنشئ ملفًا جديدًا يحتوي فقط على هذه الصفحات.</p>
+
+          <div class="tool">
+            <label class="file-label">
+              اختر ملف PDF
+              <input id="fileInput" type="file" accept="application/pdf">
+            </label>
+
+            <div id="fileInfo" class="file-info" aria-live="polite">لم يتم اختيار ملف بعد.</div>
+
+            <input id="rangesInput" type="text" placeholder="مثال: 1-3, 5, 8-10" aria-label="نطاق الصفحات">
+
+            <button id="extractBtn" class="primary">استخراج الصفحات الآن</button>
+
+            <div id="error" class="error" role="alert" aria-live="assertive"></div>
+
+            <div id="result" class="result"></div>
+
+            <div class="ad-slot ad-middle" data-ad-position="middle">
+              <!-- Google AdSense Ad Unit - Middle -->
+              <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-2108027030250763" data-ad-slot="MIDDLE_SLOT_ID" data-ad-format="auto" data-full-width-responsive="true"></ins>
+            </div>
+
+          </div>
+        </section>
+
+        <section id="split" class="panel">
+          <h2>تقسيم PDF</h2>
+          <p class="lead">قسّم ملف PDF إلى ملفات أصغر — كل صفحة ملف مستقل أو تقسيم حسب نطاقات تحددها.</p>
+
+          <div class="tool">
+            <label class="file-label">اختر ملف PDF للتقسيم
+              <input id="splitFileInput" type="file" accept="application/pdf">
+            </label>
+            <div id="splitFileInfo" class="file-info">لم يتم اختيار ملف بعد.</div>
+
+            <label><input id="splitEveryChk" type="checkbox" checked> قسّم كل صفحة إلى ملف مستقل (سيتم تنزيل ZIP)</label>
+            <div style="font-size:13px;color:var(--muted)">أو اكتب نطاقات لتجميع صفحات في ملفات منفصلة (مثال: 1-3, 5, 8-10)</div>
+            <input id="splitRangesInput" type="text" placeholder="مثال: 1-3, 5, 8-10">
+
+            <button id="splitBtn" class="primary">تقسيم الآن</button>
+
+            <div id="splitError" class="error" role="alert" aria-live="assertive"></div>
+            <div id="splitResult" class="result"></div>
+          </div>
+        </section>
+
+        <section id="merge" class="panel">
+          <h2>دمج PDF</h2>
+          <p class="lead">ادمج عدة ملفات PDF في ملف واحد بدون رفع أي شيء إلى خوادم خارجية.</p>
+
+          <div class="tool">
+            <label class="file-label">اختر ملفات PDF للدمج
+              <input id="mergeFilesInput" type="file" accept="application/pdf" multiple>
+            </label>
+            <div id="mergeFilesInfo" class="file-info">لم يتم اختيار أي ملفات بعد.</div>
+
+            <button id="mergeBtn" class="primary">دمج الملفات الآن</button>
+
+            <div id="mergeError" class="error" role="alert" aria-live="assertive"></div>
+            <div id="mergeResult" class="result"></div>
+          </div>
+        </section>
+
+        <section id="pdf2word" class="panel">
+          <h2>PDF إلى Word</h2>
+          <p class="lead">حوّل نص ملف PDF إلى مستند Word (تنزيل .doc) — يعالج النص داخل المتصفح دون رفع الملف.</p>
+
+          <div class="tool">
+            <label class="file-label">اختر ملف PDF للتحويل
+              <input id="pdf2wordInput" type="file" accept="application/pdf">
+            </label>
+            <div id="pdf2wordInfo" class="file-info">لم يتم اختيار ملف بعد.</div>
+            <button id="pdf2wordBtn" class="primary">تحويل إلى Word</button>
+            <div id="pdf2wordError" class="error" role="alert" aria-live="assertive"></div>
+            <div id="pdf2wordResult" class="result"></div>
+          </div>
+        </section>
+
+        <section id="edit" class="panel">
+          <h2>تعديل PDF</h2>
+          <p class="lead">حذف، تدوير، وإعادة ترتيب صفحات ملف PDF بسرعة في المتصفح.</p>
+          <div class="tool">
+            <label class="file-label">اختر ملف PDF للتعديل
+              <input id="editFileInput" type="file" accept="application/pdf">
+            </label>
+            <div id="editFileInfo" class="file-info">لم يتم اختيار ملف بعد.</div>
+            <div id="pagesList" style="margin-top:10px"></div>
+            <div class="text-edit-controls" style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">
+              <input id="findInput" type="text" placeholder="نص البحث" style="flex:1;min-width:160px;padding:10px;border-radius:8px;border:1px solid #e6f0f8">
+              <input id="replaceInput" type="text" placeholder="نص الاستبدال" style="flex:1;min-width:160px;padding:10px;border-radius:8px;border:1px solid #e6f0f8">
+              <button id="replaceTextBtn" class="primary">استبدال النص</button>
+            </div>
+            <button id="applyEditBtn" class="primary">تطبيق التعديلات وحفظ</button>
+            <div id="editError" class="error" role="alert" aria-live="assertive"></div>
+            <div id="editResult" class="result"></div>
+          </div>
+        </section>
+
+        <section id="img2pdf" class="panel">
+          <h2>صورة إلى PDF</h2>
+          <p class="lead">حوّل صورك (JPG/PNG) إلى ملف PDF واحد مباشرة في المتصفح.</p>
+          <div class="tool">
+            <label class="file-label">اختر صورًا (متعدد)
+              <input id="imgFilesInput" type="file" accept="image/*" multiple>
+            </label>
+            <div id="imgFilesInfo" class="file-info">لم يتم اختيار صور بعد.</div>
+            <label class="muted"><input id="fitToPageChk" type="checkbox" checked> ضبط الصورة لتملأ صفحة PDF</label>
+            <button id="img2pdfBtn" class="primary">تحويل الصور إلى PDF</button>
+            <div id="img2pdfError" class="error" role="alert" aria-live="assertive"></div>
+            <div id="img2pdfResult" class="result"></div>
+          </div>
+        </section>
+
+        <div class="ad-slot ad-bottom" data-ad-position="bottom">
+          <!-- Google AdSense Ad Unit - Bottom -->
+          <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-2108027030250763" data-ad-slot="BOTTOM_SLOT_ID" data-ad-format="auto" data-full-width-responsive="true"></ins>
+        </div>
+
+        <article>
+          <h2>كيفية استخراج صفحات من ملف PDF بسهولة وأمان</h2>
+          <p>في كثير من الحالات نحتاج إلى مشاركة جزء محدد فقط من مستند PDF بدلًا من إرساله كاملًا. قد تكون هذه الصفحات فواتير، فصول من كتاب، أو نماذج رسمية لا يتطلب مشاركتها كامل المحتوى. استخراج الصفحات المطلوبة يجعل المستند أخف، أسهل في الإرسال والطباعة، ويسهل على المتلقي التركيز على المعلومات المهمة فقط.</p>
+
+          <p>تعاني بعض الأدوات المتاحة على الإنترنت من مشاكل متعلقة بالخصوصية والشفافية؛ فبعضها يقوم برفع ملفات المستخدم إلى خوادم خارجية لمعالجتها، ما قد يعرض المستند لخطورة تسرب البيانات أو الاحتفاظ بنسخ منه. أدوات أخرى تعتمد على إعلانات مزعجة أو تضع حدودًا صارمة على حجم الملف أو عدد العمليات اليومية. كل ذلك قد يؤثر على تجربة المستخدم ويُقلل من ثقة الأفراد والمؤسسات عند استخدام هذه الخدمات.</p>
+
+          <p>الحل الأفضل هو استخدام أداة تعمل محليًا داخل متصفحك دون رفع أي ملف إلى الإنترنت. هذا يوفر سرعة معالجة أعلى، خصوصية كاملة لأن الملف لا يغادر جهازك، ولا حاجة للانتظار أو للقلق بشأن سياسات الخصوصية للخوادم الخارجية.</p>
+
+          <h3>كيفية استخدام هذه الأداة خطوة بخطوة:</h3>
+          <ol>
+            <li>اضغط على "اختر ملف PDF" واختر الملف من جهازك. ستظهر بعد ذلك رسالة تفيد باسم الملف وعدد صفحاته.</li>
+            <li>في حقل النص اكتب نطاقات الصفحات التي تريد استخراجها. يمكنك استخدام الفواصل والنطاقات كما في المثال أدناه.</li>
+            <li>مثال للتنسيق: <strong>1-3, 5, 8-10</strong> — المعنى: الصفحات 1 إلى 3، ثم الصفحة 5 منفردة، ثم الصفحات 8 إلى 10.</li>
+            <li>اضغط "استخراج الصفحات الآن" وسيتم إنشاء ملف PDF جديد يحتوي فقط على الصفحات المطلوبة مع رابط تحميل مباشر اسمه "المستخرج.pdf".</li>
+          </ol>
+
+          <p>الأداة تتحقق تلقائيًا من صحة التنسيق وتعرض رسائل خطأ واضحة إذا كانت الصيغة خاطئة أو إذا حاولت طلب صفحات لا توجد في الملف. الرسائل تظهر بالعربية لتسهيل المتابعة، مثل: "الرجاء اختيار ملف PDF أولاً." أو "صيغة نطاق الصفحات غير صالحة..." أو "إحدى الصفحات المطلوبة غير موجودة في الملف."</p>
+
+          <div class="ad-slot ad-in-article" data-ad-position="article">
+            <!-- Google AdSense Ad Unit - In-Article -->
+            <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-2108027030250763" data-ad-slot="ARTICLE_SLOT_ID" data-ad-format="auto" data-full-width-responsive="true"></ins>
+          </div>
+
+          <p>نقطة مهمة: تعمل الأداة بالكامل على جهازك باستخدام مكتبة JavaScript (pdf-lib)، ولا يتم رفع الملفات لأي خادم. هذا يجعلها مناسبة لاستخدام المستندات الحساسة أو المهنية. إذا كنت تفضل اسم ملف مختلفًا، يمكنك إعادة تسمية الملف بعد التحميل. الأداة مصممة لتكون سريعة ومرنة وتعمل على أجهزة الحاسوب والهواتف الذكية بنفس الكفاءة.</p>
+
+          <p>الخلاصة: استخدم هذه الأداة عندما تحتاج إلى تخصيص مستند PDF بسرعة وحفاظًا على الخصوصية. هي بديل عملي للأدوات التي ترفع ملفاتك إلى الإنترنت، وتمنحك تحكمًا أدق في الصفحات التي تريد مشاركتها أو أرشفتها. جرّبها الآن، وسترى كيف تصبح إدارة ملفات PDF أسهل وأسرع وأكثر أمانًا.</p>
+        </article>
+
+      </section>
+    </div>
+  </main>
+
+    <!-- Visible summaries for policies (appear on homepage so content is plainly visible) -->
+    <section class="tool-area" style="margin-top:18px">
+      <h2>معلومات أساسية عن الموقع (سياسة/شروط/نبذة)</h2>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-top:12px">
+        <div style="background:#fff;padding:12px;border-radius:8px;min-height:120px">
+          <h3 style="margin-top:0">سياسة الخصوصية</h3>
+          <p style="font-size:13px;color:#234">هذا الموقع يعالج ملفات PDF محليًا في المتصفح ولا يرفع الملفات إلى خوادم خارجية افتراضيًا. قد تُستخدم إعدادات محلية مثل localStorage لحفظ إعدادات بسيطة.</p>
+          <p style="margin-top:6px"><a href="privacy.html">اقرأ المزيد</a></p>
+        </div>
+        <div style="background:#fff;padding:12px;border-radius:8px;min-height:120px">
+          <h3 style="margin-top:0">شروط الاستخدام</h3>
+          <p style="font-size:13px;color:#234">المستخدم مسؤول عن المحتوى الذي يقوم بمعالجته. الأداة تُقدّم كما هي ولا نتحمل مسؤولية الأضرار الناتجة عن الاستخدام.</p>
+          <p style="margin-top:6px"><a href="terms.html">اقرأ المزيد</a></p>
+        </div>
+        <div style="background:#fff;padding:12px;border-radius:8px;min-height:120px">
+          <h3 style="margin-top:0">عن الموقع</h3>
+          <p style="font-size:13px;color:#234">مدير PDF أداة مجانية لمعالجة ملفات PDF داخل المتصفح. تم إضافة صفحات ثابتة ومعلومات اتصال لتحسين مصداقية الموقع.</p>
+          <p style="margin-top:6px"><a href="about.html">اقرأ المزيد</a></p>
+        </div>
+      </div>
+    </section>
+
+  <footer>
+    <p>© جميع الحقوق محفوظة — مدير PDF</p>
+    <p class="footer-links"><a href="privacy.html">سياسة الخصوصية</a> · <a href="terms.html">شروط الاستخدام</a> · <a href="about.html">عن الموقع</a></p>
+  </footer>
+
+  <!-- Page editor modal: full-screen click-to-edit -->
+  <div id="pageEditorModal" class="page-editor-modal" aria-hidden="true">
+    <div class="page-editor-toolbar">
+      <div class="left">محرر الصفحة</div>
+      <div class="right">
+        <button id="editorSave" class="primary">حفظ التعديلات</button>
+        <button id="editorClose" class="secondary">إغلاق</button>
+      </div>
+    </div>
+    <div class="page-editor-content">
+      <div id="editorCanvasWrap" class="editor-canvas-wrap">
+        <canvas id="editorCanvas"></canvas>
+        <div id="editorOverlays" class="editor-overlays"></div>
+      </div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+  
+  <!-- Auto-initialize AdSense ads on page load -->
+  <script>
+    // Push ads after page load
+    window.addEventListener('load', function() {
+      try {
+        (adsbygoogle = window.adsbygoogle || []).push({});
+        (adsbygoogle = window.adsbygoogle || []).push({});
+        (adsbygoogle = window.adsbygoogle || []).push({});
+        (adsbygoogle = window.adsbygoogle || []).push({});
+      } catch(e) {
+        console.warn('AdSense initialization:', e);
+      }
+    });
+  </script>
+</body>
+</html>

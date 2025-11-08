@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>لوحة إدارة الإعلانات — مدير PDF</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    body{padding:22px}
+    .card{background:var(--card);padding:18px;border-radius:12px;max-width:760px;margin:18px auto;box-shadow:0 12px 30px rgba(3,15,25,0.06)}
+    label{display:block;margin-top:12px;font-weight:700}
+    input[type=text]{width:100%;padding:10px;border-radius:8px;border:1px solid #e6f0f8}
+    .hint{font-size:13px;color:var(--muted);margin-top:6px}
+  </style>
+</head>
+<body>
+  <main>
+    <div class="card">
+      <h2>لوحة إدارة الإعلانات (محمية)</h2>
+      <p class="hint">الوصول محمي بكلمة مرور. أدخل كلمة المرور لعرض خيارات إدارة وحدات AdSense.</p>
+
+      <div id="loginBox">
+        <label>كلمة مرور المشرف</label>
+        <input id="pw" type="password" placeholder="كلمة المرور">
+        <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:12px">
+          <button id="loginBtn" class="primary">دخول</button>
+        </div>
+        <div id="loginMsg" class="muted" style="margin-top:8px"></div>
+      </div>
+
+      <div id="adminArea" style="display:none;margin-top:12px">
+        <h3>إعدادات وحدات AdSense</h3>
+        <p class="hint">أدخل قيم data-ad-slot التي تحصل عليها من حساب AdSense لكل موقع. اترك الحقل فارغًا لتعطيل الوحدة.</p>
+
+        <label for="slotTop">Top slot (أعلى الصفحة)</label>
+        <input id="slotTop" type="text" placeholder="مثال: 1234567890">
+
+        <label for="slotMiddle">Middle slot (داخل الأداة)</label>
+        <input id="slotMiddle" type="text" placeholder="مثال: 2345678901">
+
+        <label for="slotArticle">Article slot (داخل المقالة)</label>
+        <input id="slotArticle" type="text" placeholder="مثال: 3456789012">
+
+        <label for="slotBottom">Bottom slot (أسفل الأداة)</label>
+        <input id="slotBottom" type="text" placeholder="مثال: 4567890123">
+
+        <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:14px">
+          <button id="saveBtn" class="primary">حفظ التغييرات</button>
+          <button id="logoutBtn" class="secondary">خروج</button>
+        </div>
+        <div id="saveMsg" class="muted" style="margin-top:8px"></div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    // Simple admin page (client-side). Password is compared in code (same as main page).
+    const ADMIN_PASSWORD = 'mosap@123123'; // kept internal, not shown in UI
+    const pwInput = document.getElementById('pw');
+    const loginBtn = document.getElementById('loginBtn');
+    const loginMsg = document.getElementById('loginMsg');
+    const adminArea = document.getElementById('adminArea');
+    const loginBox = document.getElementById('loginBox');
+
+    const slotTop = document.getElementById('slotTop');
+    const slotMiddle = document.getElementById('slotMiddle');
+    const slotArticle = document.getElementById('slotArticle');
+    const slotBottom = document.getElementById('slotBottom');
+    const saveBtn = document.getElementById('saveBtn');
+    const logoutBtn = document.getElementById('logoutBtn');
+    const saveMsg = document.getElementById('saveMsg');
+
+    function showAdmin(){
+      loginBox.style.display = 'none';
+      adminArea.style.display = 'block';
+      // load existing
+      slotTop.value = localStorage.getItem('ad_slot_top') || '';
+      slotMiddle.value = localStorage.getItem('ad_slot_middle') || '';
+      slotArticle.value = localStorage.getItem('ad_slot_article') || '';
+      slotBottom.value = localStorage.getItem('ad_slot_bottom') || '';
+    }
+
+    loginBtn.addEventListener('click', ()=>{
+      const v = pwInput.value || '';
+      if(v === ADMIN_PASSWORD){
+        loginMsg.textContent = 'تم التحقق. جاري فتح لوحة الإدارة...';
+        showAdmin();
+      } else {
+        loginMsg.textContent = 'كلمة المرور غير صحيحة.';
+        pwInput.value = ''; pwInput.focus();
+      }
+    });
+
+    saveBtn.addEventListener('click', ()=>{
+      localStorage.setItem('ad_slot_top', slotTop.value.trim());
+      localStorage.setItem('ad_slot_middle', slotMiddle.value.trim());
+      localStorage.setItem('ad_slot_article', slotArticle.value.trim());
+      localStorage.setItem('ad_slot_bottom', slotBottom.value.trim());
+      // notify other pages by toggling a timestamp
+      localStorage.setItem('ad_config_updated', String(Date.now()));
+      saveMsg.textContent = 'تم الحفظ. سيُفعّل الإعلانات تلقائيًا على الصفحة الرئيسية.';
+      setTimeout(()=>saveMsg.textContent = '', 3000);
+    });
+
+    logoutBtn.addEventListener('click', ()=>{
+      adminArea.style.display = 'none';
+      loginBox.style.display = 'block';
+      pwInput.value = '';
+    });
+
+    // allow Enter to submit
+    pwInput.addEventListener('keypress', (e)=>{ if(e.key === 'Enter') loginBtn.click(); });
+  </script>
+</body>
+</html>

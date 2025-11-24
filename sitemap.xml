@@ -16,6 +16,13 @@
   </url>
 
   <url>
+    <loc>https://www.pdftoole.com/admin.html</loc>
+    <lastmod>2025-11-24</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+  <url>
     <loc>https://www.pdftoole.com/privacy.html</loc>
     <lastmod>2025-11-24</lastmod>
     <changefreq>yearly</changefreq>
@@ -27,13 +34,6 @@
     <lastmod>2025-11-24</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.6</priority>
-  </url>
-
-  <url>
-    <loc>https://www.pdftoole.com/admin.html</loc>
-    <lastmod>2025-11-24</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.5</priority>
   </url>
 
 </urlset>
